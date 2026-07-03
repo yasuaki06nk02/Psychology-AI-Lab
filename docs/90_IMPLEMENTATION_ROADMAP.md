@@ -68,7 +68,7 @@ Completion status should be updated as development progresses.
  [x] Configuration
  [x] Environment Variables
  [x] Logging
- [ ] Exception Handler
+ [x] Exception Handler
  [x] Dependency Injection
 
 ## Database
