@@ -47,7 +47,7 @@ def main() -> None:
         benchmark_id="benchmark-operational-smoke",
         benchmark_version="1.0.0",
         provider_name=provider_name,
-        model_name="gpt-4o-mini" if provider_name == "openai" else "mock-model-v1",
+        model_name=settings.openai_model_name if provider_name == "openai" else "mock-model-v1",
         model_version="runtime",
         dataset_name="smoke-dataset",
         dataset_version="v1",

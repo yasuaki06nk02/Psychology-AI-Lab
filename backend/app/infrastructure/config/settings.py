@@ -13,6 +13,7 @@ class Settings(BaseSettings):
     provider_retry_delay_seconds: float = 0.2
     openai_api_key: str = ""
     openai_base_url: str = "https://api.openai.com/v1"
+    openai_model_name: str = "gpt-4o-mini"
 
     model_config = SettingsConfigDict(
         env_file=".env",
