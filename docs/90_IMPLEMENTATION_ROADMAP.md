@@ -34,16 +34,16 @@ Completion status should be updated as development progresses.
 
 ## Repository
 
- [ ] Create Git repository
+ [x] Create Git repository
  [ ] Configure branch strategy
- [ ] Configure .gitignore
+ [x] Configure .gitignore
  [ ] Configure LICENSE
- [ ] Configure README
+ [x] Configure README
 
 ## Development Environment
 
  [ ] Flutter Web
- [ ] FastAPI
+ [x] FastAPI
  [ ] PostgreSQL
  [ ] SQLite
  [ ] Docker
@@ -55,7 +55,7 @@ Completion status should be updated as development progresses.
 
  [ ] GitHub Actions
  [ ] Lint
- [ ] Unit Test
+ [x] Unit Test
  [ ] Build Test
 
 ---
@@ -64,12 +64,12 @@ Completion status should be updated as development progresses.
 
 ## FastAPI
 
- [ ] Initialize Project
- [ ] Configuration
- [ ] Environment Variables
- [ ] Logging
+ [x] Initialize Project
+ [x] Configuration
+ [x] Environment Variables
+ [x] Logging
  [ ] Exception Handler
- [ ] Dependency Injection
+ [x] Dependency Injection
 
 ## Database
 

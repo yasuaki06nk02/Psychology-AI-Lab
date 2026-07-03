@@ -6,6 +6,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 class Settings(BaseSettings):
     service_name: str = "psychology-ai-lab"
     api_version: str = "0.1.0"
+    log_level: str = "INFO"
 
     model_config = SettingsConfigDict(
         env_file=".env",
