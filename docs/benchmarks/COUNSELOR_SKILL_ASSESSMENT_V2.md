@@ -25,6 +25,10 @@ It is designed to make level differences visible in benchmark output.
 
 - backend/datasets/counselor_skill_assessment_v2.json
 
+## Result JSON Guide
+
+- docs/benchmarks/BENCHMARK_RESULT_JSON_GUIDE.md
+
 ## Evaluation Axes
 
 - Domain split:
