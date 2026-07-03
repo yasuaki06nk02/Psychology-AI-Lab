@@ -74,9 +74,9 @@ Completion status should be updated as development progresses.
 ## Database
 
  [x] SQLAlchemy
- [ ] Alembic
- [ ] Database Connection
- [ ] Migration System
+ [x] Alembic
+ [x] Database Connection
+ [x] Migration System
 
 ## Repository Layer
 
