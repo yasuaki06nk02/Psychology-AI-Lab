@@ -14,6 +14,7 @@ from app.application.benchmarking.models import (
     PromptTemplate,
 )
 from app.application.benchmarking.scoring_engine import ScoringEngine
+from app.application.benchmarking.insight_report import build_model_insight_report
 from app.application.benchmarking.trial_service import BenchmarkTrialService
 from app.application.errors import AppError
 from app.application.providers.provider_manager import ProviderManager
@@ -80,6 +81,7 @@ def _parse_args() -> argparse.Namespace:
     parser.add_argument("--dataset-file", default=None)
     parser.add_argument("--pass-threshold", type=float, default=0.8)
     parser.add_argument("--report-file", default="benchmark_trial_report.json")
+    parser.add_argument("--insight-report-file", default=None)
     parser.add_argument("--inter-request-delay-seconds", type=float, default=0.0)
     return parser.parse_args()
 
@@ -221,6 +223,16 @@ def main() -> None:
     )
     trial_service.save_report(report, args.report_file)
 
+    insight_file = args.insight_report_file
+    if not insight_file:
+        report_path = Path(args.report_file)
+        insight_file = str(report_path.with_name(report_path.stem + "_insight.md"))
+
+    insight_text = build_model_insight_report(report)
+    insight_path = Path(insight_file)
+    insight_path.parent.mkdir(parents=True, exist_ok=True)
+    insight_path.write_text(insight_text, encoding="utf-8")
+
     print("exam_name:", exam_name)
     if benchmark_origin:
         print("benchmark_origin:", benchmark_origin)
@@ -235,6 +247,7 @@ def main() -> None:
     print("passed:", report.passed)
     print("duration_seconds:", f"{duration_seconds:.2f}")
     print("report_file:", args.report_file)
+    print("insight_report_file:", insight_file)
     for item in result.responses:
         if item.evaluation_type == "keyword":
             expected_display = item.expected_reference or ("keywords: " + ", ".join(item.expected_keywords))

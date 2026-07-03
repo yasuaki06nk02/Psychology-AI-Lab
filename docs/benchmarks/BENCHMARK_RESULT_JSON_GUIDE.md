@@ -3,6 +3,7 @@
 This document explains how to interpret benchmark result files such as:
 
 - backend/reports/gemini_trial.json
+- backend/reports/gemini_trial_insight.md
 
 ## Purpose
 
@@ -10,6 +11,8 @@ Benchmark result JSON is for model quality comparison and tracking.
 
 - It is not a legal qualification certificate.
 - It does not grant professional licenses.
+
+Model insight markdown is generated from the same result to summarize strengths, weaknesses, and risk points.
 
 ## Top-Level Fields
 
