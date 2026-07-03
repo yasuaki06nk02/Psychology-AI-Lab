@@ -10,15 +10,32 @@ from app.application.benchmarking.models import (
     PromptTemplate,
 )
 from app.application.benchmarking.scoring_engine import ScoringEngine
+from app.application.providers.provider_manager import ProviderManager
+from app.application.providers.provider_registry import ProviderRegistry
 from app.application.providers.provider_bootstrap import create_provider_manager
 from app.infrastructure.config.settings import get_settings
+from app.infrastructure.providers.mock_provider_adapter import MockProviderAdapter
 
 
 def main() -> None:
     settings = get_settings()
     provider_name = "openai" if settings.openai_api_key else "mock"
 
-    manager = create_provider_manager(settings)
+    if provider_name == "mock":
+        # Deterministic smoke test behavior for local benchmark validation.
+        registry = ProviderRegistry()
+        registry.register(
+            MockProviderAdapter(
+                name="mock",
+                scripted_outputs={
+                    "2+2?": "4",
+                    "3+5?": "8",
+                },
+            )
+        )
+        manager = ProviderManager(registry)
+    else:
+        manager = create_provider_manager(settings)
     engine = BenchmarkEngine(
         manager,
         ScoringEngine(),
