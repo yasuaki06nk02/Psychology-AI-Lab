@@ -1,6 +1,12 @@
 from functools import lru_cache
+from pathlib import Path
 
 from pydantic_settings import BaseSettings, SettingsConfigDict
+
+
+_THIS_DIR = Path(__file__).resolve().parent
+_BACKEND_ROOT = _THIS_DIR.parent.parent.parent
+_REPO_ROOT = _BACKEND_ROOT.parent
 
 
 class Settings(BaseSettings):
@@ -16,7 +22,10 @@ class Settings(BaseSettings):
     openai_model_name: str = "gpt-4o-mini"
 
     model_config = SettingsConfigDict(
-        env_file=".env",
+        env_file=(
+            str(_BACKEND_ROOT / ".env"),
+            str(_REPO_ROOT / ".env"),
+        ),
         env_file_encoding="utf-8",
         extra="ignore",
     )
