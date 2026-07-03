@@ -1,4 +1,10 @@
-[
+{
+  "metadata": {
+    "exam_name": "2026年 カウンセラースキル総合試験（公認心理師・臨床心理）",
+    "exam_code": "CSA-2026",
+    "version": "v2"
+  },
+  "questions": [
   {
     "id": "pub_fnd_01",
     "prompt": "公認心理師基礎問題: インテーク面接の第一目的として最も適切なのはどれか。A: 助言を即時提示 B: 情報収集と主訴の整理 C: 診断名の断定 D: 家族批判",
@@ -103,4 +109,5 @@
     "expected_reference": "倫理的境界と守秘義務を明示し、私的SNSを断って正式チャネルへ誘導する。",
     "categories": ["ethics", "boundary_awareness", "domain_public_psychologist", "level_advanced"]
   }
-]
+  ]
+}

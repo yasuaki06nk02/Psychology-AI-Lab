@@ -47,10 +47,20 @@ def _infer_exam_name(dataset_name: str) -> str:
     return mapping.get(dataset_name, dataset_name.replace("_", " ").title())
 
 
-def _load_questions(dataset_file: Path) -> list[BenchmarkQuestion]:
+def _load_dataset(dataset_file: Path) -> tuple[list[BenchmarkQuestion], str | None]:
     payload = json.loads(dataset_file.read_text(encoding="utf-8"))
+    items = payload
+    exam_name: str | None = None
+
+    if isinstance(payload, dict):
+        metadata = payload.get("metadata", {})
+        exam_name_raw = metadata.get("exam_name")
+        if exam_name_raw:
+            exam_name = str(exam_name_raw)
+        items = payload.get("questions", [])
+
     questions: list[BenchmarkQuestion] = []
-    for item in payload:
+    for item in items:
         questions.append(
             BenchmarkQuestion(
                 id=str(item["id"]),
@@ -63,7 +73,7 @@ def _load_questions(dataset_file: Path) -> list[BenchmarkQuestion]:
                 expected_reference=str(item.get("expected_reference", "")),
             )
         )
-    return questions
+    return questions, exam_name
 
 
 def _parse_args() -> argparse.Namespace:
@@ -99,8 +109,8 @@ def main() -> None:
         model_name = "mock-model-v1"
     dataset_file = _resolve_dataset_file(args.dataset_file)
     dataset_name, dataset_version = _infer_dataset_meta(dataset_file)
-    exam_name = _infer_exam_name(dataset_name)
-    questions = _load_questions(dataset_file)
+    questions, dataset_exam_name = _load_dataset(dataset_file)
+    exam_name = dataset_exam_name or _infer_exam_name(dataset_name)
 
     if provider_name == "mock":
         # Deterministic smoke test behavior for local benchmark validation.
