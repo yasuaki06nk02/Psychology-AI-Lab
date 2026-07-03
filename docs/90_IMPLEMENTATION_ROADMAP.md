@@ -90,39 +90,39 @@ Completion status should be updated as development progresses.
 
 ## Provider
 
- [ ] Entity
- [ ] Repository
- [ ] Service
+ [x] Entity
+ [x] Repository
+ [x] Service
 
 ## Model
 
- [ ] Entity
- [ ] Repository
- [ ] Service
+ [x] Entity
+ [x] Repository
+ [x] Service
 
 ## Dataset
 
- [ ] Entity
- [ ] Repository
- [ ] Service
+ [x] Entity
+ [x] Repository
+ [x] Service
 
 ## Benchmark
 
- [ ] Entity
- [ ] Repository
- [ ] Service
+ [x] Entity
+ [x] Repository
+ [x] Service
 
 ## Result
 
- [ ] Entity
- [ ] Repository
- [ ] Service
+ [x] Entity
+ [x] Repository
+ [x] Service
 
 ## Experiment
 
- [ ] Entity
- [ ] Repository
- [ ] Service
+ [x] Entity
+ [x] Repository
+ [x] Service
 
 ---
 
