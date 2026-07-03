@@ -20,6 +20,9 @@ class Settings(BaseSettings):
     openai_api_key: str = ""
     openai_base_url: str = "https://api.openai.com/v1"
     openai_model_name: str = "gpt-4o-mini"
+    gemini_api_key: str = ""
+    gemini_base_url: str = "https://generativelanguage.googleapis.com/v1beta"
+    gemini_model_name: str = "gemini-2.0-flash"
 
     model_config = SettingsConfigDict(
         env_file=(

@@ -67,7 +67,7 @@ def _load_questions(dataset_file: Path) -> list[BenchmarkQuestion]:
 
 def _parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Run benchmark trial")
-    parser.add_argument("--provider", choices=["mock", "openai"], default=None)
+    parser.add_argument("--provider", choices=["mock", "openai", "gemini"], default=None)
     parser.add_argument("--model", default=None)
     parser.add_argument("--dataset-file", default=None)
     parser.add_argument("--pass-threshold", type=float, default=0.8)
@@ -78,10 +78,23 @@ def _parse_args() -> argparse.Namespace:
 def main() -> None:
     args = _parse_args()
     settings = get_settings()
-    provider_name = args.provider or ("openai" if settings.openai_api_key else "mock")
-    model_name = args.model or (
-        settings.openai_model_name if provider_name == "openai" else "mock-model-v1"
-    )
+    if args.provider:
+        provider_name = args.provider
+    elif settings.openai_api_key:
+        provider_name = "openai"
+    elif settings.gemini_api_key:
+        provider_name = "gemini"
+    else:
+        provider_name = "mock"
+
+    if args.model:
+        model_name = args.model
+    elif provider_name == "openai":
+        model_name = settings.openai_model_name
+    elif provider_name == "gemini":
+        model_name = settings.gemini_model_name
+    else:
+        model_name = "mock-model-v1"
     dataset_file = _resolve_dataset_file(args.dataset_file)
     dataset_name, dataset_version = _infer_dataset_meta(dataset_file)
     exam_name = _infer_exam_name(dataset_name)
