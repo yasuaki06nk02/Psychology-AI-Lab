@@ -7,6 +7,7 @@ class Settings(BaseSettings):
     service_name: str = "psychology-ai-lab"
     api_version: str = "0.1.0"
     log_level: str = "INFO"
+    database_url: str = "sqlite:///./psychology_ai_lab.db"
 
     model_config = SettingsConfigDict(
         env_file=".env",

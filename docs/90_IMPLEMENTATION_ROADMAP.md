@@ -73,7 +73,7 @@ Completion status should be updated as development progresses.
 
 ## Database
 
- [ ] SQLAlchemy
+ [x] SQLAlchemy
  [ ] Alembic
  [ ] Database Connection
  [ ] Migration System
