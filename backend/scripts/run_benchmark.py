@@ -60,6 +60,7 @@ def _load_questions(dataset_file: Path) -> list[BenchmarkQuestion]:
                 categories=[str(category) for category in item.get("categories", ["accuracy"])],
                 accepted_answers=[str(answer) for answer in item.get("accepted_answers", [])],
                 expected_keywords=[str(keyword) for keyword in item.get("expected_keywords", [])],
+                expected_reference=str(item.get("expected_reference", "")),
             )
         )
     return questions
@@ -198,7 +199,11 @@ def main() -> None:
     print("duration_seconds:", f"{duration_seconds:.2f}")
     print("report_file:", args.report_file)
     for item in result.responses:
-        print(item.question_id, "=>", item.answer, "(expected:", item.expected_answer + ")")
+        if item.evaluation_type == "keyword":
+            expected_display = item.expected_reference or ("keywords: " + ", ".join(item.expected_keywords))
+        else:
+            expected_display = item.expected_answer
+        print(item.question_id, "=>", item.answer, "(expected:", expected_display + ")")
 
     if not report.passed:
         raise SystemExit(1)

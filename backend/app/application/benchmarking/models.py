@@ -10,6 +10,7 @@ class BenchmarkQuestion:
     categories: list[str] = field(default_factory=lambda: ["accuracy"])
     accepted_answers: list[str] = field(default_factory=list)
     expected_keywords: list[str] = field(default_factory=list)
+    expected_reference: str = ""
 
 
 @dataclass(frozen=True, slots=True)
@@ -46,6 +47,7 @@ class BenchmarkResponse:
     latency_ms: int
     input_tokens: int
     output_tokens: int
+    expected_reference: str = ""
 
 
 @dataclass(frozen=True, slots=True)

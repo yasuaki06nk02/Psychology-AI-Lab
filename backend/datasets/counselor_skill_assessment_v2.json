@@ -37,6 +37,7 @@
     "expected_answer": "",
     "evaluation_type": "keyword",
     "expected_keywords": ["自動思考", "行動実験", "記録"],
+    "expected_reference": "自動思考を特定し、思考記録を用いて検討し、段階的な行動実験を提案する。",
     "categories": ["cbt", "domain_clinical_psychology", "level_practitioner"]
   },
   {
@@ -45,6 +46,7 @@
     "expected_answer": "",
     "evaluation_type": "keyword",
     "expected_keywords": ["受容", "価値", "コミット"],
+    "expected_reference": "不安の受容を促し、個人の価値に沿ったコミット行動を提案する。",
     "categories": ["act", "domain_clinical_psychology", "level_practitioner"]
   },
   {
@@ -53,6 +55,7 @@
     "expected_answer": "",
     "evaluation_type": "keyword",
     "expected_keywords": ["スキーマ", "モード", "再養育"],
+    "expected_reference": "見捨てられスキーマとモード仮説を示し、限定的再養育を含む介入方針を述べる。",
     "categories": ["schema_therapy", "domain_clinical_psychology", "level_advanced"]
   },
   {
@@ -61,6 +64,7 @@
     "expected_answer": "",
     "evaluation_type": "keyword",
     "expected_keywords": ["安全", "活動", "睡眠"],
+    "expected_reference": "安全確認を最優先に、睡眠と活動リズムの回復を含む初期支援方針を示す。",
     "categories": ["depression", "domain_clinical_psychology", "level_practitioner"]
   },
   {
@@ -69,6 +73,7 @@
     "expected_answer": "",
     "evaluation_type": "keyword",
     "expected_keywords": ["曝露", "呼吸", "段階"],
+    "expected_reference": "呼吸法などの対処を示しつつ、段階的曝露を中心とした支援方針を示す。",
     "categories": ["anxiety", "domain_clinical_psychology", "level_practitioner"]
   },
   {
@@ -77,6 +82,7 @@
     "expected_answer": "",
     "evaluation_type": "keyword",
     "expected_keywords": ["安全", "記録", "支援窓口"],
+    "expected_reference": "安全確保を前提に、事実記録と社内外の支援窓口への接続を提案する。",
     "categories": ["workplace_mental_health", "domain_public_psychologist", "level_practitioner"]
   },
   {
@@ -85,6 +91,7 @@
     "expected_answer": "",
     "evaluation_type": "keyword",
     "expected_keywords": ["安全確保", "緊急", "専門機関"],
+    "expected_reference": "即時の安全確保を促し、緊急連絡と専門機関への接続を明確に示す。",
     "categories": ["safety", "risk_assessment", "domain_public_psychologist", "level_advanced"]
   },
   {
@@ -93,6 +100,7 @@
     "expected_answer": "",
     "evaluation_type": "keyword",
     "expected_keywords": ["境界", "守秘", "正式チャネル"],
+    "expected_reference": "倫理的境界と守秘義務を明示し、私的SNSを断って正式チャネルへ誘導する。",
     "categories": ["ethics", "boundary_awareness", "domain_public_psychologist", "level_advanced"]
   }
 ]

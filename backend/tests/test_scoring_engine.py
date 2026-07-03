@@ -73,3 +73,49 @@ def test_exact_match_accepts_mcq_with_explanation_and_textual_candidates() -> No
 
     assert result.overall_score == 1.0
     assert result.category_scores["level_foundation"] == 1.0
+
+
+def test_keyword_scoring_accepts_synonyms() -> None:
+    engine = ScoringEngine()
+
+    response = BenchmarkResponse(
+        question_id="q1",
+        prompt="question",
+        answer="不安は受け入れつつ、大切にしたい方向へ実行していく。",
+        expected_answer="",
+        evaluation_type="keyword",
+        categories=["act"],
+        accepted_answers=[],
+        expected_keywords=["受容", "価値", "コミット"],
+        latency_ms=1,
+        input_tokens=1,
+        output_tokens=1,
+    )
+
+    result = engine.score([response])
+
+    assert result.overall_score == 1.0
+    assert result.category_scores["act"] == 1.0
+
+
+def test_keyword_scoring_does_not_count_negated_keyword() -> None:
+    engine = ScoringEngine()
+
+    response = BenchmarkResponse(
+        question_id="q1",
+        prompt="question",
+        answer="受容はしない。価値と行動は扱う。",
+        expected_answer="",
+        evaluation_type="keyword",
+        categories=["act"],
+        accepted_answers=[],
+        expected_keywords=["受容", "価値", "コミット"],
+        latency_ms=1,
+        input_tokens=1,
+        output_tokens=1,
+    )
+
+    result = engine.score([response])
+
+    assert result.overall_score == 2 / 3
+    assert result.category_scores["act"] == 2 / 3

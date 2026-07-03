@@ -92,6 +92,7 @@ class BenchmarkEngine:
                     latency_ms=provider_response.latency_ms,
                     input_tokens=provider_response.input_tokens,
                     output_tokens=provider_response.output_tokens,
+                    expected_reference=question.expected_reference,
                 )
             )
 

@@ -5,6 +5,28 @@ from app.application.benchmarking.models import BenchmarkResponse, ScoreResult
 
 class ScoringEngine:
     _MCQ_PATTERN = re.compile(r"([a-z])\s*[:：\)\]\.、-]")
+    _NEGATION_BEFORE_MARKERS = ("不要", "しない", "するな", "不適切", "禁止")
+    _NEGATION_AFTER_MARKERS = ("ではない", "でない", "じゃない", "しない")
+    _KEYWORD_SYNONYMS: dict[str, tuple[str, ...]] = {
+        "自動思考": ("認知", "自分の考え"),
+        "行動実験": ("行動課題", "小さな行動"),
+        "記録": ("記録化", "ログ"),
+        "受容": ("受け入れ", "あるがまま"),
+        "価値": ("価値観", "大切"),
+        "コミット": ("コミットメント", "実行", "行動"),
+        "再養育": ("限定的再養育",),
+        "活動": ("行動活性化",),
+        "曝露": ("段階的曝露", "エクスポージャー"),
+        "呼吸": ("呼吸法",),
+        "段階": ("段階的",),
+        "支援窓口": ("相談窓口", "公式窓口", "公的窓口"),
+        "安全確保": ("安全を確保", "身の安全"),
+        "緊急": ("救急", "119"),
+        "専門機関": ("医療機関", "精神科", "専門家"),
+        "境界": ("境界設定",),
+        "守秘": ("守秘義務", "秘密保持"),
+        "正式チャネル": ("公式チャネル", "正規チャネル", "公式窓口"),
+    }
 
     @staticmethod
     def _normalize(text: str) -> str:
@@ -21,6 +43,44 @@ class ScoringEngine:
             return token_match.group(1)
         return None
 
+    def _has_negation_nearby(self, answer: str, variant: str) -> bool:
+        start = answer.find(variant)
+        if start == -1:
+            return False
+
+        sentence_delimiters = ("。", "!", "?", "\n")
+        left_boundary = -1
+        for delimiter in sentence_delimiters:
+            left_boundary = max(left_boundary, answer.rfind(delimiter, 0, start))
+        left_boundary += 1
+
+        right_boundary = len(answer)
+        right_candidates = [answer.find(delimiter, start + len(variant)) for delimiter in sentence_delimiters]
+        valid_right_candidates = [index for index in right_candidates if index != -1]
+        if valid_right_candidates:
+            right_boundary = min(valid_right_candidates)
+
+        clause = answer[left_boundary:right_boundary]
+        local_start = clause.find(variant)
+        if local_start == -1:
+            return False
+
+        left = clause[max(0, local_start - 10):local_start]
+        right = clause[local_start + len(variant): local_start + len(variant) + 10]
+        if any(marker in left for marker in self._NEGATION_BEFORE_MARKERS):
+            return True
+        if any(marker in right for marker in self._NEGATION_AFTER_MARKERS):
+            return True
+        return False
+
+    def _concept_matched(self, answer: str, keyword: str) -> bool:
+        variants = [keyword, *self._KEYWORD_SYNONYMS.get(keyword, ())]
+        for variant in variants:
+            normalized_variant = self._normalize(variant)
+            if normalized_variant and normalized_variant in answer and not self._has_negation_nearby(answer, normalized_variant):
+                return True
+        return False
+
     def _score_item(self, item: BenchmarkResponse) -> float:
         answer = self._normalize(item.answer)
 
@@ -28,7 +88,7 @@ class ScoringEngine:
             keywords = [self._normalize(keyword) for keyword in item.expected_keywords if keyword.strip()]
             if not keywords:
                 return 0.0
-            matched = sum(1 for keyword in keywords if keyword in answer)
+            matched = sum(1 for keyword in keywords if self._concept_matched(answer, keyword))
             return matched / len(keywords)
 
         expected_candidates = [item.expected_answer, *item.accepted_answers]
