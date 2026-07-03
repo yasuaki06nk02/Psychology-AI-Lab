@@ -1,4 +1,4 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 
 @dataclass(frozen=True, slots=True)
@@ -6,6 +6,10 @@ class BenchmarkQuestion:
     id: str
     prompt: str
     expected_answer: str
+    evaluation_type: str = "exact_match"
+    categories: list[str] = field(default_factory=lambda: ["accuracy"])
+    accepted_answers: list[str] = field(default_factory=list)
+    expected_keywords: list[str] = field(default_factory=list)
 
 
 @dataclass(frozen=True, slots=True)
@@ -35,6 +39,10 @@ class BenchmarkResponse:
     prompt: str
     answer: str
     expected_answer: str
+    evaluation_type: str
+    categories: list[str]
+    accepted_answers: list[str]
+    expected_keywords: list[str]
     latency_ms: int
     input_tokens: int
     output_tokens: int

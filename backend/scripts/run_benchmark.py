@@ -22,10 +22,7 @@ from app.infrastructure.providers.mock_provider_adapter import MockProviderAdapt
 
 def _load_questions(dataset_file: str | None) -> list[BenchmarkQuestion]:
     if dataset_file is None:
-        return [
-            BenchmarkQuestion(id="q1", prompt="2+2?", expected_answer="4"),
-            BenchmarkQuestion(id="q2", prompt="3+5?", expected_answer="8"),
-        ]
+        dataset_file = str(Path(__file__).resolve().parents[1] / "datasets" / "psychology_eval_v1.json")
 
     payload = json.loads(Path(dataset_file).read_text(encoding="utf-8"))
     questions: list[BenchmarkQuestion] = []
@@ -35,6 +32,10 @@ def _load_questions(dataset_file: str | None) -> list[BenchmarkQuestion]:
                 id=str(item["id"]),
                 prompt=str(item["prompt"]),
                 expected_answer=str(item["expected_answer"]),
+                evaluation_type=str(item.get("evaluation_type", "exact_match")),
+                categories=[str(category) for category in item.get("categories", ["accuracy"])],
+                accepted_answers=[str(answer) for answer in item.get("accepted_answers", [])],
+                expected_keywords=[str(keyword) for keyword in item.get("expected_keywords", [])],
             )
         )
     return questions
@@ -62,7 +63,12 @@ def main() -> None:
     if provider_name == "mock":
         # Deterministic smoke test behavior for local benchmark validation.
         registry = ProviderRegistry()
-        scripted_outputs = {question.prompt: question.expected_answer for question in questions}
+        scripted_outputs = {}
+        for question in questions:
+            if question.evaluation_type == "keyword":
+                scripted_outputs[question.prompt] = " ".join(question.expected_keywords)
+            else:
+                scripted_outputs[question.prompt] = question.expected_answer or ""
         registry.register(
             MockProviderAdapter(
                 name="mock",
@@ -80,12 +86,12 @@ def main() -> None:
     )
 
     definition = BenchmarkDefinition(
-        benchmark_id="benchmark-operational-smoke",
-        benchmark_version="1.0.0",
+        benchmark_id="benchmark-psychology-eval",
+        benchmark_version="1.1.0",
         provider_name=provider_name,
         model_name=model_name,
         model_version="runtime",
-        dataset_name="smoke-dataset",
+        dataset_name="psychology-eval",
         dataset_version="v1",
         questions=questions,
         prompt_template=PromptTemplate(
