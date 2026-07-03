@@ -1,10 +1,25 @@
+import re
+
 from app.application.benchmarking.models import BenchmarkResponse, ScoreResult
 
 
 class ScoringEngine:
+    _MCQ_PATTERN = re.compile(r"([a-z])\s*[:：\)\]\.、-]")
+
     @staticmethod
     def _normalize(text: str) -> str:
         return " ".join(text.strip().lower().split())
+
+    def _extract_mcq_choice(self, text: str) -> str | None:
+        head = text.strip().lower()[:120]
+        match = self._MCQ_PATTERN.search(head)
+        if match:
+            return match.group(1)
+
+        token_match = re.search(r"\b([a-d])\b", head)
+        if token_match:
+            return token_match.group(1)
+        return None
 
     def _score_item(self, item: BenchmarkResponse) -> float:
         answer = self._normalize(item.answer)
@@ -22,6 +37,13 @@ class ScoringEngine:
             for candidate in expected_candidates
             if candidate and candidate.strip()
         ]
+
+        # Accept explanatory outputs like "B: ..." for multiple-choice questions.
+        if normalized_candidates and all(len(candidate) == 1 and candidate.isalpha() for candidate in normalized_candidates):
+            choice = self._extract_mcq_choice(item.answer)
+            if choice and choice in normalized_candidates:
+                return 1.0
+
         return 1.0 if answer in normalized_candidates else 0.0
 
     def score(self, responses: list[BenchmarkResponse]) -> ScoreResult:
