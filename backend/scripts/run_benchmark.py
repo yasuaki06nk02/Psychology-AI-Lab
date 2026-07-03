@@ -47,16 +47,13 @@ def _infer_exam_name(dataset_name: str) -> str:
     return mapping.get(dataset_name, dataset_name.replace("_", " ").title())
 
 
-def _load_dataset(dataset_file: Path) -> tuple[list[BenchmarkQuestion], str | None]:
+def _load_dataset(dataset_file: Path) -> tuple[list[BenchmarkQuestion], dict[str, object]]:
     payload = json.loads(dataset_file.read_text(encoding="utf-8"))
     items = payload
-    exam_name: str | None = None
+    metadata: dict[str, object] = {}
 
     if isinstance(payload, dict):
-        metadata = payload.get("metadata", {})
-        exam_name_raw = metadata.get("exam_name")
-        if exam_name_raw:
-            exam_name = str(exam_name_raw)
+        metadata = payload.get("metadata", {}) if isinstance(payload.get("metadata", {}), dict) else {}
         items = payload.get("questions", [])
 
     questions: list[BenchmarkQuestion] = []
@@ -73,7 +70,7 @@ def _load_dataset(dataset_file: Path) -> tuple[list[BenchmarkQuestion], str | No
                 expected_reference=str(item.get("expected_reference", "")),
             )
         )
-    return questions, exam_name
+    return questions, metadata
 
 
 def _parse_args() -> argparse.Namespace:
@@ -109,8 +106,27 @@ def main() -> None:
         model_name = "mock-model-v1"
     dataset_file = _resolve_dataset_file(args.dataset_file)
     dataset_name, dataset_version = _infer_dataset_meta(dataset_file)
-    questions, dataset_exam_name = _load_dataset(dataset_file)
-    exam_name = dataset_exam_name or _infer_exam_name(dataset_name)
+    questions, dataset_metadata = _load_dataset(dataset_file)
+    exam_name = str(dataset_metadata.get("exam_name") or _infer_exam_name(dataset_name))
+    benchmark_origin = str(dataset_metadata.get("benchmark_origin")) if dataset_metadata.get("benchmark_origin") else None
+    alignment_status = str(dataset_metadata.get("alignment_status")) if dataset_metadata.get("alignment_status") else None
+    qualification_equivalence_raw = dataset_metadata.get("qualification_equivalence")
+    qualification_equivalence = (
+        bool(qualification_equivalence_raw)
+        if isinstance(qualification_equivalence_raw, bool)
+        else None
+    )
+    qualification_disclaimer = (
+        str(dataset_metadata.get("qualification_disclaimer"))
+        if dataset_metadata.get("qualification_disclaimer")
+        else None
+    )
+    source_references_raw = dataset_metadata.get("source_references")
+    source_references = (
+        [str(item) for item in source_references_raw]
+        if isinstance(source_references_raw, list)
+        else []
+    )
 
     if provider_name == "mock":
         # Deterministic smoke test behavior for local benchmark validation.
@@ -197,10 +213,21 @@ def main() -> None:
         result,
         duration_seconds=duration_seconds,
         exam_name=exam_name,
+        benchmark_origin=benchmark_origin,
+        alignment_status=alignment_status,
+        qualification_equivalence=qualification_equivalence,
+        qualification_disclaimer=qualification_disclaimer,
+        source_references=source_references,
     )
     trial_service.save_report(report, args.report_file)
 
     print("exam_name:", exam_name)
+    if benchmark_origin:
+        print("benchmark_origin:", benchmark_origin)
+    if alignment_status:
+        print("alignment_status:", alignment_status)
+    if qualification_disclaimer:
+        print("qualification_disclaimer:", qualification_disclaimer)
     print("provider:", result.provider_name)
     print("model:", result.model_name)
     print("overall_score:", result.score.overall_score)

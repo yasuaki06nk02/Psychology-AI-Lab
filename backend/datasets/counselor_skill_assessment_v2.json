@@ -2,7 +2,16 @@
   "metadata": {
     "exam_name": "2026年 カウンセラースキル総合試験（公認心理師・臨床心理）",
     "exam_code": "CSA-2026",
-    "version": "v2"
+    "version": "v2",
+    "benchmark_origin": "custom_internal_benchmark",
+    "alignment_status": "partial_alignment_with_publicly_available_exam_domains",
+    "qualification_equivalence": false,
+    "qualification_disclaimer": "本ベンチマークは研究用の独自評価であり、公認心理師等の国家資格取得・同等性を示すものではありません。",
+    "source_references": [
+      "公認心理師法（資格制度の法的根拠）",
+      "公認心理師試験出題基準（公開情報ベースの領域参照）",
+      "心理療法ガイドライン（CBT/ACT/Schema関連の公開情報）"
+    ]
   },
   "questions": [
   {

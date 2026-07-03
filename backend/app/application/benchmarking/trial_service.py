@@ -12,6 +12,11 @@ from app.application.benchmarking.models import BenchmarkRunResult
 class BenchmarkTrialReport:
     generated_at: str
     exam_name: str | None
+    benchmark_origin: str | None
+    alignment_status: str | None
+    qualification_equivalence: bool | None
+    qualification_disclaimer: str | None
+    source_references: list[str]
     provider_name: str
     model_name: str
     benchmark_id: str
@@ -35,11 +40,21 @@ class BenchmarkTrialService:
         result: BenchmarkRunResult,
         duration_seconds: float | None = None,
         exam_name: str | None = None,
+        benchmark_origin: str | None = None,
+        alignment_status: str | None = None,
+        qualification_equivalence: bool | None = None,
+        qualification_disclaimer: str | None = None,
+        source_references: list[str] | None = None,
     ) -> BenchmarkTrialReport:
         overall_score = result.score.overall_score
         return BenchmarkTrialReport(
             generated_at=datetime.now(UTC).isoformat(),
             exam_name=exam_name,
+            benchmark_origin=benchmark_origin,
+            alignment_status=alignment_status,
+            qualification_equivalence=qualification_equivalence,
+            qualification_disclaimer=qualification_disclaimer,
+            source_references=source_references or [],
             provider_name=result.provider_name,
             model_name=result.model_name,
             benchmark_id=result.benchmark_id,

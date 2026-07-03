@@ -1,5 +1,17 @@
 # Counselor Skill Assessment v2
 
+## Qualification Notice
+
+- This benchmark is a custom internal research benchmark.
+- Passing this benchmark does not grant, replace, or imply eligibility for national qualifications such as Licensed/Public Psychologist credentials.
+- The benchmark is intended for model comparison and quality improvement only.
+
+## Alignment Policy
+
+- When public exam blueprints and public guidance are available, question domains should be aligned to those published domains.
+- Items must not claim to be official past questions unless their provenance is explicitly documented and legally reusable.
+- Every dataset version should include metadata for origin, alignment status, and references.
+
 ## Purpose
 
 This benchmark measures practical counselor skill across both:
