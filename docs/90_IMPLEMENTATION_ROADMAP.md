@@ -130,8 +130,8 @@ Completion status should be updated as development progresses.
 
 ## Provider Manager
 
- [ ] Common Interface
- [ ] Provider Registry
+ [x] Common Interface
+ [x] Provider Registry
 
 ## OpenAI
 
@@ -161,20 +161,20 @@ Completion status should be updated as development progresses.
 
 # Phase 4 — Benchmark Engine
 
- [ ] Benchmark Loader
- [ ] Prompt Builder
- [ ] Execution Pipeline
+ [x] Benchmark Loader
+ [x] Prompt Builder
+ [x] Execution Pipeline
  [ ] Retry Logic
  [ ] Timeout Handling
- [ ] Metadata Recording
+ [x] Metadata Recording
 
 ---
 
 # Phase 5 — Scoring Engine
 
- [ ] Score Calculator
- [ ] Category Score
- [ ] Overall Score
+ [x] Score Calculator
+ [x] Category Score
+ [x] Overall Score
  [ ] Weight Calculation
  [ ] Score History
 
@@ -303,8 +303,8 @@ Completion status should be updated as development progresses.
 
 ## Benchmark Test
 
- [ ] Reproducibility
- [ ] Score Consistency
+ [x] Reproducibility
+ [x] Score Consistency
 
 ---
 
