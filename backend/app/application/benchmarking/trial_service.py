@@ -11,6 +11,7 @@ from app.application.benchmarking.models import BenchmarkRunResult
 @dataclass(frozen=True, slots=True)
 class BenchmarkTrialReport:
     generated_at: str
+    exam_name: str | None
     provider_name: str
     model_name: str
     benchmark_id: str
@@ -33,10 +34,12 @@ class BenchmarkTrialService:
         self,
         result: BenchmarkRunResult,
         duration_seconds: float | None = None,
+        exam_name: str | None = None,
     ) -> BenchmarkTrialReport:
         overall_score = result.score.overall_score
         return BenchmarkTrialReport(
             generated_at=datetime.now(UTC).isoformat(),
+            exam_name=exam_name,
             provider_name=result.provider_name,
             model_name=result.model_name,
             benchmark_id=result.benchmark_id,

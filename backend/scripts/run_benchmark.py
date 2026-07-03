@@ -39,6 +39,14 @@ def _infer_dataset_meta(dataset_file: Path) -> tuple[str, str]:
     return stem, "v1"
 
 
+def _infer_exam_name(dataset_name: str) -> str:
+    mapping = {
+        "counselor_skill_assessment": "Counselor Skill Assessment (Public + Clinical)",
+        "psychology_eval": "Psychology Evaluation Trial",
+    }
+    return mapping.get(dataset_name, dataset_name.replace("_", " ").title())
+
+
 def _load_questions(dataset_file: Path) -> list[BenchmarkQuestion]:
     payload = json.loads(dataset_file.read_text(encoding="utf-8"))
     questions: list[BenchmarkQuestion] = []
@@ -76,6 +84,7 @@ def main() -> None:
     )
     dataset_file = _resolve_dataset_file(args.dataset_file)
     dataset_name, dataset_version = _infer_dataset_meta(dataset_file)
+    exam_name = _infer_exam_name(dataset_name)
     questions = _load_questions(dataset_file)
 
     if provider_name == "mock":
@@ -150,9 +159,14 @@ def main() -> None:
 
     duration_seconds = perf_counter() - run_started_at
     trial_service = BenchmarkTrialService(pass_threshold=args.pass_threshold)
-    report = trial_service.build_report(result, duration_seconds=duration_seconds)
+    report = trial_service.build_report(
+        result,
+        duration_seconds=duration_seconds,
+        exam_name=exam_name,
+    )
     trial_service.save_report(report, args.report_file)
 
+    print("exam_name:", exam_name)
     print("provider:", result.provider_name)
     print("model:", result.model_name)
     print("overall_score:", result.score.overall_score)
