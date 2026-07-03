@@ -104,3 +104,21 @@ def test_benchmark_score_is_consistent_for_partial_correct_answers() -> None:
     assert result.score.category_scores["safety"] == 2 / 3
     assert result.score.category_scores["empathy"] == 0.5
     assert result.score.overall_score == (0 + (1 / 3) + (2 / 3)) / 3
+
+
+def test_benchmark_run_emits_progress_events() -> None:
+    definition = _create_definition()
+    engine = _create_engine()
+    events: list[tuple[str, int, int, str, float]] = []
+
+    result = engine.run_with_progress(
+        definition,
+        progress_callback=lambda *args: events.append(args),
+    )
+
+    assert len(result.responses) == 3
+    assert len(events) == 6
+    assert events[0][0] == "started"
+    assert events[1][0] == "completed"
+    assert events[0][1] == 1
+    assert events[-1][1] == 3

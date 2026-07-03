@@ -37,11 +37,13 @@ def test_trial_report_passes_when_score_meets_threshold() -> None:
 
     assert report.passed is True
     assert report.overall_score == 0.9
+    assert report.duration_seconds is None
 
 
 def test_trial_report_fails_when_score_below_threshold() -> None:
     service = BenchmarkTrialService(pass_threshold=0.8)
-    report = service.build_report(_result(0.5))
+    report = service.build_report(_result(0.5), duration_seconds=12.34)
 
     assert report.passed is False
     assert report.pass_threshold == 0.8
+    assert report.duration_seconds == 12.34

@@ -3,6 +3,7 @@ import sys
 import argparse
 import json
 import re
+from time import perf_counter
 
 sys.path.append(str(Path(__file__).resolve().parents[1]))
 
@@ -118,9 +119,27 @@ def main() -> None:
         ),
     )
 
-    result = engine.run(definition)
+    run_started_at = perf_counter()
+
+    def _progress(status: str, index: int, total: int, question_id: str, elapsed_seconds: float) -> None:
+        if status == "started":
+            print(f"[progress] {index}/{total} {question_id} started", flush=True)
+            return
+        if status == "completed":
+            print(
+                f"[progress] {index}/{total} {question_id} completed in {elapsed_seconds:.2f}s",
+                flush=True,
+            )
+            return
+        print(
+            f"[progress] {index}/{total} {question_id} failed after {elapsed_seconds:.2f}s",
+            flush=True,
+        )
+
+    result = engine.run_with_progress(definition, progress_callback=_progress)
+    duration_seconds = perf_counter() - run_started_at
     trial_service = BenchmarkTrialService(pass_threshold=args.pass_threshold)
-    report = trial_service.build_report(result)
+    report = trial_service.build_report(result, duration_seconds=duration_seconds)
     trial_service.save_report(report, args.report_file)
 
     print("provider:", result.provider_name)
@@ -128,6 +147,7 @@ def main() -> None:
     print("overall_score:", result.score.overall_score)
     print("pass_threshold:", report.pass_threshold)
     print("passed:", report.passed)
+    print("duration_seconds:", f"{duration_seconds:.2f}")
     print("report_file:", args.report_file)
     for item in result.responses:
         print(item.question_id, "=>", item.answer, "(expected:", item.expected_answer + ")")

@@ -20,6 +20,7 @@ class BenchmarkTrialReport:
     prompt_version: str
     overall_score: float
     category_scores: dict[str, float]
+    duration_seconds: float | None
     pass_threshold: float
     passed: bool
 
@@ -28,7 +29,11 @@ class BenchmarkTrialService:
     def __init__(self, pass_threshold: float) -> None:
         self._pass_threshold = pass_threshold
 
-    def build_report(self, result: BenchmarkRunResult) -> BenchmarkTrialReport:
+    def build_report(
+        self,
+        result: BenchmarkRunResult,
+        duration_seconds: float | None = None,
+    ) -> BenchmarkTrialReport:
         overall_score = result.score.overall_score
         return BenchmarkTrialReport(
             generated_at=datetime.now(UTC).isoformat(),
@@ -41,6 +46,7 @@ class BenchmarkTrialService:
             prompt_version=result.prompt_version,
             overall_score=overall_score,
             category_scores=result.score.category_scores,
+            duration_seconds=duration_seconds,
             pass_threshold=self._pass_threshold,
             passed=overall_score >= self._pass_threshold,
         )

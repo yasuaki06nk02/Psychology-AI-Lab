@@ -1,4 +1,6 @@
 from time import sleep
+from time import perf_counter
+from typing import Callable
 
 from app.application.errors import AppError
 from app.application.benchmarking.models import (
@@ -26,9 +28,28 @@ class BenchmarkEngine:
         self._retry_delay_seconds = retry_delay_seconds
 
     def run(self, definition: BenchmarkDefinition) -> BenchmarkRunResult:
-        responses: list[BenchmarkResponse] = []
+        return self.run_with_progress(definition)
 
-        for question in definition.questions:
+    def run_with_progress(
+        self,
+        definition: BenchmarkDefinition,
+        progress_callback: Callable[[str, int, int, str, float], None] | None = None,
+    ) -> BenchmarkRunResult:
+        responses: list[BenchmarkResponse] = []
+        run_started_at = perf_counter()
+        total_questions = len(definition.questions)
+
+        for index, question in enumerate(definition.questions, start=1):
+            question_started_at = perf_counter()
+            if progress_callback is not None:
+                progress_callback(
+                    "started",
+                    index,
+                    total_questions,
+                    question.id,
+                    question_started_at - run_started_at,
+                )
+
             user_prompt = definition.prompt_template.user_template.format(
                 question=question.prompt,
                 question_id=question.id,
@@ -40,7 +61,18 @@ class BenchmarkEngine:
                 developer_prompt=definition.prompt_template.developer_prompt,
                 user_prompt=user_prompt,
             )
-            provider_response = self._execute_with_retry(definition.provider_name, request)
+            try:
+                provider_response = self._execute_with_retry(definition.provider_name, request)
+            except Exception:
+                if progress_callback is not None:
+                    progress_callback(
+                        "failed",
+                        index,
+                        total_questions,
+                        question.id,
+                        perf_counter() - question_started_at,
+                    )
+                raise
 
             responses.append(
                 BenchmarkResponse(
@@ -57,6 +89,15 @@ class BenchmarkEngine:
                     output_tokens=provider_response.output_tokens,
                 )
             )
+
+            if progress_callback is not None:
+                progress_callback(
+                    "completed",
+                    index,
+                    total_questions,
+                    question.id,
+                    perf_counter() - question_started_at,
+                )
 
         score = self._scoring_engine.score(responses)
 
