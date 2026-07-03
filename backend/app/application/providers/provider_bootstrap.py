@@ -15,8 +15,19 @@ def create_provider_manager(settings: Settings) -> ProviderManager:
     if settings.openai_api_key:
         registry.register(
             OpenAIProviderAdapter(
+                name="openai",
                 api_key=settings.openai_api_key,
                 base_url=settings.openai_base_url,
+                timeout_seconds=settings.provider_timeout_seconds,
+            )
+        )
+
+    if settings.copilot_api_key:
+        registry.register(
+            OpenAIProviderAdapter(
+                name="copilot",
+                api_key=settings.copilot_api_key,
+                base_url=settings.copilot_base_url,
                 timeout_seconds=settings.provider_timeout_seconds,
             )
         )

@@ -12,3 +12,16 @@ def test_provider_bootstrap_registers_gemini_when_configured() -> None:
 
     assert "mock" in manager.list_providers()
     assert "gemini" in manager.list_providers()
+
+
+def test_provider_bootstrap_registers_copilot_when_configured() -> None:
+    settings = Settings(
+        openai_api_key="",
+        gemini_api_key="",
+        copilot_api_key="test-copilot-key",
+    )
+
+    manager = create_provider_manager(settings)
+
+    assert "mock" in manager.list_providers()
+    assert "copilot" in manager.list_providers()

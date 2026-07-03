@@ -64,6 +64,40 @@ def test_openai_adapter_executes_prompt() -> None:
     assert response.output_tokens == 1
 
 
+def test_openai_adapter_supports_custom_provider_name() -> None:
+    def handler(request: httpx.Request) -> httpx.Response:
+        if request.url.path.endswith("/chat/completions"):
+            payload = {
+                "model": "gpt-4.1",
+                "choices": [{"message": {"content": "ok"}, "finish_reason": "stop"}],
+                "usage": {"prompt_tokens": 1, "completion_tokens": 1},
+            }
+            return httpx.Response(200, content=json.dumps(payload))
+        return httpx.Response(404, json={})
+
+    client = httpx.Client(transport=httpx.MockTransport(handler), timeout=1.0)
+    adapter = OpenAIProviderAdapter(
+        name="copilot",
+        api_key="test",
+        base_url="https://models.inference.ai.azure.com",
+        timeout_seconds=1.0,
+        client=client,
+    )
+
+    assert adapter.name == "copilot"
+
+    response = adapter.execute_prompt(
+        ProviderRequest(
+            model_name="gpt-4.1",
+            system_prompt="system",
+            developer_prompt="developer",
+            user_prompt="ping",
+        )
+    )
+
+    assert response.provider_name == "copilot"
+
+
 def test_openai_adapter_maps_rate_limit_to_app_error() -> None:
     def handler(request: httpx.Request) -> httpx.Response:
         if request.url.path.endswith("/chat/completions"):

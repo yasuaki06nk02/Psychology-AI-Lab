@@ -18,11 +18,13 @@ class OpenAIProviderAdapter(ProviderAdapter):
     def __init__(
         self,
         *,
+        name: str = "openai",
         api_key: str,
         base_url: str,
         timeout_seconds: float,
         client: httpx.Client | None = None,
     ) -> None:
+        self._name = name
         self._api_key = api_key
         self._base_url = base_url.rstrip("/")
         self._timeout_seconds = timeout_seconds
@@ -30,7 +32,7 @@ class OpenAIProviderAdapter(ProviderAdapter):
 
     @property
     def name(self) -> str:
-        return "openai"
+        return self._name
 
     def _headers(self) -> dict[str, str]:
         return {
