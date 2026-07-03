@@ -39,9 +39,11 @@ class ScoringEngine:
         ]
 
         # Accept explanatory outputs like "B: ..." for multiple-choice questions.
-        if normalized_candidates and all(len(candidate) == 1 and candidate.isalpha() for candidate in normalized_candidates):
+        # Use expected_answer as the MCQ signal because accepted_answers may also include long text variants.
+        expected_answer = self._normalize(item.expected_answer)
+        if len(expected_answer) == 1 and expected_answer.isalpha():
             choice = self._extract_mcq_choice(item.answer)
-            if choice and choice in normalized_candidates:
+            if choice and choice == expected_answer:
                 return 1.0
 
         return 1.0 if answer in normalized_candidates else 0.0

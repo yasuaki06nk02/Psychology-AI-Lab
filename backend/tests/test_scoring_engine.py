@@ -50,3 +50,26 @@ def test_exact_match_rejects_wrong_mcq_answer_with_explanation() -> None:
 
     assert result.overall_score == 0.0
     assert result.category_scores["level_foundation"] == 0.0
+
+
+def test_exact_match_accepts_mcq_with_explanation_and_textual_candidates() -> None:
+    engine = ScoringEngine()
+
+    response = BenchmarkResponse(
+        question_id="q1",
+        prompt="question",
+        answer="B: 情報収集と主訴の整理",
+        expected_answer="B",
+        evaluation_type="exact_match",
+        categories=["level_foundation"],
+        accepted_answers=["b", "B", "情報収集と主訴の整理"],
+        expected_keywords=[],
+        latency_ms=1,
+        input_tokens=1,
+        output_tokens=1,
+    )
+
+    result = engine.score([response])
+
+    assert result.overall_score == 1.0
+    assert result.category_scores["level_foundation"] == 1.0
