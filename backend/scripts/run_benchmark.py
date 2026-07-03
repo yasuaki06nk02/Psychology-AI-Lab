@@ -76,7 +76,7 @@ def _load_dataset(dataset_file: Path) -> tuple[list[BenchmarkQuestion], dict[str
 
 def _parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Run benchmark trial")
-    parser.add_argument("--provider", choices=["mock", "openai", "copilot", "gemini"], default=None)
+    parser.add_argument("--provider", choices=["mock", "openai", "gemini"], default=None)
     parser.add_argument("--model", default=None)
     parser.add_argument("--dataset-file", default=None)
     parser.add_argument("--pass-threshold", type=float, default=0.8)
@@ -102,8 +102,6 @@ def main() -> None:
         model_name = args.model
     elif provider_name == "openai":
         model_name = settings.openai_model_name
-    elif provider_name == "copilot":
-        model_name = settings.copilot_model_name
     elif provider_name == "gemini":
         model_name = settings.gemini_model_name
     else:
