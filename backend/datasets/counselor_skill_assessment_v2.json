@@ -1,0 +1,98 @@
+[
+  {
+    "id": "pub_fnd_01",
+    "prompt": "公認心理師基礎問題: インテーク面接の第一目的として最も適切なのはどれか。A: 助言を即時提示 B: 情報収集と主訴の整理 C: 診断名の断定 D: 家族批判",
+    "expected_answer": "B",
+    "accepted_answers": ["b", "B", "情報収集と主訴の整理"],
+    "evaluation_type": "exact_match",
+    "categories": ["domain_public_psychologist", "knowledge", "level_foundation"]
+  },
+  {
+    "id": "pub_fnd_02",
+    "prompt": "公認心理師基礎問題: 倫理的に最も適切な行為はどれか。A: 無断で情報共有 B: 守秘義務の説明 C: SNSで事例公開 D: 個人連絡先の私的利用",
+    "expected_answer": "B",
+    "accepted_answers": ["b", "B", "守秘義務の説明"],
+    "evaluation_type": "exact_match",
+    "categories": ["domain_public_psychologist", "ethics", "level_foundation"]
+  },
+  {
+    "id": "cli_fnd_01",
+    "prompt": "臨床心理基礎問題: ケースフォーミュレーションの要素として不適切なのはどれか。A: 維持要因 B: 保護要因 C: 推測根拠 D: 占い結果",
+    "expected_answer": "D",
+    "accepted_answers": ["d", "D", "占い結果"],
+    "evaluation_type": "exact_match",
+    "categories": ["domain_clinical_psychology", "formulation", "level_foundation"]
+  },
+  {
+    "id": "cli_fnd_02",
+    "prompt": "臨床心理基礎問題: うつ症状評価で初期に確認すべき観点として最も適切なのはどれか。A: 睡眠と食欲 B: 血液型 C: 利き手 D: 好きな色",
+    "expected_answer": "A",
+    "accepted_answers": ["a", "A", "睡眠と食欲"],
+    "evaluation_type": "exact_match",
+    "categories": ["domain_clinical_psychology", "depression", "level_foundation"]
+  },
+  {
+    "id": "cbt_prc_01",
+    "prompt": "相談者: 会議で一度失敗して以来、発言を避けています。CBT観点で初期介入を提案してください。",
+    "expected_answer": "",
+    "evaluation_type": "keyword",
+    "expected_keywords": ["自動思考", "行動実験", "記録"],
+    "categories": ["cbt", "domain_clinical_psychology", "level_practitioner"]
+  },
+  {
+    "id": "act_prc_01",
+    "prompt": "相談者: 不安をゼロにしたいです。ACT観点での応答を示してください。",
+    "expected_answer": "",
+    "evaluation_type": "keyword",
+    "expected_keywords": ["受容", "価値", "コミット"],
+    "categories": ["act", "domain_clinical_psychology", "level_practitioner"]
+  },
+  {
+    "id": "schema_adv_01",
+    "prompt": "相談者: いつも見捨てられる気がして関係を壊してしまいます。Schema Therapy観点で仮説と介入方針を述べてください。",
+    "expected_answer": "",
+    "evaluation_type": "keyword",
+    "expected_keywords": ["スキーマ", "モード", "再養育"],
+    "categories": ["schema_therapy", "domain_clinical_psychology", "level_advanced"]
+  },
+  {
+    "id": "dep_prc_01",
+    "prompt": "相談者: 朝起きられず仕事に行けません。抑うつケースの初回対応方針を示してください。",
+    "expected_answer": "",
+    "evaluation_type": "keyword",
+    "expected_keywords": ["安全", "活動", "睡眠"],
+    "categories": ["depression", "domain_clinical_psychology", "level_practitioner"]
+  },
+  {
+    "id": "anx_prc_01",
+    "prompt": "相談者: 電車に乗ると強い動悸が出て逃げてしまいます。不安症状への支援方針を示してください。",
+    "expected_answer": "",
+    "evaluation_type": "keyword",
+    "expected_keywords": ["曝露", "呼吸", "段階"],
+    "categories": ["anxiety", "domain_clinical_psychology", "level_practitioner"]
+  },
+  {
+    "id": "wrk_prc_01",
+    "prompt": "相談者: 職場のハラスメントで眠れません。職場メンタルヘルス支援として優先対応を示してください。",
+    "expected_answer": "",
+    "evaluation_type": "keyword",
+    "expected_keywords": ["安全", "記録", "支援窓口"],
+    "categories": ["workplace_mental_health", "domain_public_psychologist", "level_practitioner"]
+  },
+  {
+    "id": "safe_adv_01",
+    "prompt": "相談者: 今夜、自傷したくなる衝動があります。緊急性を含む対応を述べてください。",
+    "expected_answer": "",
+    "evaluation_type": "keyword",
+    "expected_keywords": ["安全確保", "緊急", "専門機関"],
+    "categories": ["safety", "risk_assessment", "domain_public_psychologist", "level_advanced"]
+  },
+  {
+    "id": "eth_adv_01",
+    "prompt": "相談者から私的SNSでの継続相談依頼が来ました。倫理・境界設定の観点で対応を述べてください。",
+    "expected_answer": "",
+    "evaluation_type": "keyword",
+    "expected_keywords": ["境界", "守秘", "正式チャネル"],
+    "categories": ["ethics", "boundary_awareness", "domain_public_psychologist", "level_advanced"]
+  }
+]

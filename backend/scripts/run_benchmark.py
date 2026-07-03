@@ -2,6 +2,7 @@ from pathlib import Path
 import sys
 import argparse
 import json
+import re
 
 sys.path.append(str(Path(__file__).resolve().parents[1]))
 
@@ -20,11 +21,24 @@ from app.infrastructure.config.settings import get_settings
 from app.infrastructure.providers.mock_provider_adapter import MockProviderAdapter
 
 
-def _load_questions(dataset_file: str | None) -> list[BenchmarkQuestion]:
+def _resolve_dataset_file(dataset_file: str | None) -> Path:
     if dataset_file is None:
-        dataset_file = str(Path(__file__).resolve().parents[1] / "datasets" / "psychology_eval_v1.json")
+        return Path(__file__).resolve().parents[1] / "datasets" / "counselor_skill_assessment_v2.json"
+    return Path(dataset_file)
 
-    payload = json.loads(Path(dataset_file).read_text(encoding="utf-8"))
+
+def _infer_dataset_meta(dataset_file: Path) -> tuple[str, str]:
+    stem = dataset_file.stem
+    match = re.search(r"_v(\d+)$", stem)
+    if match:
+        version = f"v{match.group(1)}"
+        name = stem[: match.start()]
+        return name, version
+    return stem, "v1"
+
+
+def _load_questions(dataset_file: Path) -> list[BenchmarkQuestion]:
+    payload = json.loads(dataset_file.read_text(encoding="utf-8"))
     questions: list[BenchmarkQuestion] = []
     for item in payload:
         questions.append(
@@ -58,7 +72,9 @@ def main() -> None:
     model_name = args.model or (
         settings.openai_model_name if provider_name == "openai" else "mock-model-v1"
     )
-    questions = _load_questions(args.dataset_file)
+    dataset_file = _resolve_dataset_file(args.dataset_file)
+    dataset_name, dataset_version = _infer_dataset_meta(dataset_file)
+    questions = _load_questions(dataset_file)
 
     if provider_name == "mock":
         # Deterministic smoke test behavior for local benchmark validation.
@@ -86,13 +102,13 @@ def main() -> None:
     )
 
     definition = BenchmarkDefinition(
-        benchmark_id="benchmark-psychology-eval",
-        benchmark_version="1.1.0",
+        benchmark_id=f"benchmark-{dataset_name}",
+        benchmark_version="1.2.0",
         provider_name=provider_name,
         model_name=model_name,
         model_version="runtime",
-        dataset_name="psychology-eval",
-        dataset_version="v1",
+        dataset_name=dataset_name,
+        dataset_version=dataset_version,
         questions=questions,
         prompt_template=PromptTemplate(
             version="v1",
