@@ -1,7 +1,9 @@
 import json
 
 import httpx
+import pytest
 
+from app.application.errors import AppError
 from app.application.providers.interfaces import ProviderRequest
 from app.infrastructure.providers.openai_provider_adapter import OpenAIProviderAdapter
 
@@ -60,3 +62,35 @@ def test_openai_adapter_executes_prompt() -> None:
     assert response.content == "4"
     assert response.input_tokens == 12
     assert response.output_tokens == 1
+
+
+def test_openai_adapter_maps_rate_limit_to_app_error() -> None:
+    def handler(request: httpx.Request) -> httpx.Response:
+        if request.url.path.endswith("/chat/completions"):
+            return httpx.Response(
+                429,
+                headers={"X-RateLimit-Reset": "1783123200000"},
+                json={"error": {"message": "Rate limit exceeded", "code": 429}},
+            )
+        return httpx.Response(404, json={})
+
+    client = httpx.Client(transport=httpx.MockTransport(handler), timeout=1.0)
+    adapter = OpenAIProviderAdapter(
+        api_key="test",
+        base_url="https://api.openai.com/v1",
+        timeout_seconds=1.0,
+        client=client,
+    )
+
+    with pytest.raises(AppError) as exc_info:
+        adapter.execute_prompt(
+            ProviderRequest(
+                model_name="gpt-4o-mini",
+                system_prompt="system",
+                developer_prompt="developer",
+                user_prompt="2+2?",
+            )
+        )
+
+    assert exc_info.value.code == "provider_rate_limit"
+    assert exc_info.value.status_code == 429

@@ -15,6 +15,7 @@ from app.application.benchmarking.models import (
 )
 from app.application.benchmarking.scoring_engine import ScoringEngine
 from app.application.benchmarking.trial_service import BenchmarkTrialService
+from app.application.errors import AppError
 from app.application.providers.provider_manager import ProviderManager
 from app.application.providers.provider_registry import ProviderRegistry
 from app.application.providers.provider_bootstrap import create_provider_manager
@@ -136,7 +137,17 @@ def main() -> None:
             flush=True,
         )
 
-    result = engine.run_with_progress(definition, progress_callback=_progress)
+    try:
+        result = engine.run_with_progress(definition, progress_callback=_progress)
+    except AppError as exc:
+        duration_seconds = perf_counter() - run_started_at
+        print("benchmark_failed:", exc.code, flush=True)
+        print("error_message:", exc.message, flush=True)
+        print("duration_seconds:", f"{duration_seconds:.2f}", flush=True)
+        if exc.code == "provider_rate_limit":
+            print("hint: OpenRouter free tier daily limit reached. Retry after reset or add credits.", flush=True)
+        raise SystemExit(1)
+
     duration_seconds = perf_counter() - run_started_at
     trial_service = BenchmarkTrialService(pass_threshold=args.pass_threshold)
     report = trial_service.build_report(result, duration_seconds=duration_seconds)

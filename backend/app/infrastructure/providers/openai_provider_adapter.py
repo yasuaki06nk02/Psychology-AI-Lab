@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import json
+from datetime import UTC, datetime
 from time import perf_counter
 
 import httpx
@@ -36,6 +38,39 @@ class OpenAIProviderAdapter(ProviderAdapter):
             "Content-Type": "application/json",
         }
 
+    @staticmethod
+    def _parse_rate_limit_reset(response: httpx.Response) -> str | None:
+        reset_raw = response.headers.get("X-RateLimit-Reset")
+        if not reset_raw:
+            return None
+        try:
+            reset_ms = int(reset_raw)
+        except ValueError:
+            return None
+        return datetime.fromtimestamp(reset_ms / 1000, tz=UTC).isoformat()
+
+    def _to_app_error(self, exc: httpx.HTTPStatusError) -> AppError:
+        response = exc.response
+        status = response.status_code
+        body_text = response.text
+
+        if status == 429:
+            reset_at = self._parse_rate_limit_reset(response)
+            suffix = f" reset_at={reset_at}" if reset_at else ""
+            return AppError(
+                "provider_rate_limit",
+                f"Rate limit exceeded (429){suffix}. body={body_text}",
+                429,
+            )
+
+        if status in {401, 403}:
+            return AppError("authentication_error", f"OpenAI auth error: {body_text}", status)
+
+        if status >= 500:
+            return AppError("provider_execution_error", f"OpenAI server error: {body_text}", 502)
+
+        return AppError("invalid_request", f"OpenAI error: {body_text}", 400)
+
     def list_models(self) -> list[str]:
         url = f"{self._base_url}/models"
         try:
@@ -47,7 +82,7 @@ class OpenAIProviderAdapter(ProviderAdapter):
         except httpx.TimeoutException as exc:
             raise TimeoutError("OpenAI model discovery timed out") from exc
         except httpx.HTTPStatusError as exc:
-            raise AppError("invalid_request", f"OpenAI error: {exc.response.text}", 400) from exc
+            raise self._to_app_error(exc) from exc
         except httpx.HTTPError as exc:
             raise ConnectionError("OpenAI model discovery connection error") from exc
 
@@ -89,6 +124,6 @@ class OpenAIProviderAdapter(ProviderAdapter):
         except httpx.TimeoutException as exc:
             raise TimeoutError("OpenAI completion timed out") from exc
         except httpx.HTTPStatusError as exc:
-            raise AppError("invalid_request", f"OpenAI error: {exc.response.text}", 400) from exc
+            raise self._to_app_error(exc) from exc
         except httpx.HTTPError as exc:
             raise ConnectionError("OpenAI completion connection error") from exc
