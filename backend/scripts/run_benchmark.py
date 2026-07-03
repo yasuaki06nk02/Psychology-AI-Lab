@@ -72,6 +72,7 @@ def _parse_args() -> argparse.Namespace:
     parser.add_argument("--dataset-file", default=None)
     parser.add_argument("--pass-threshold", type=float, default=0.8)
     parser.add_argument("--report-file", default="benchmark_trial_report.json")
+    parser.add_argument("--inter-request-delay-seconds", type=float, default=0.0)
     return parser.parse_args()
 
 
@@ -123,6 +124,7 @@ def main() -> None:
         ScoringEngine(),
         max_retries=settings.provider_max_retries,
         retry_delay_seconds=settings.provider_retry_delay_seconds,
+        inter_request_delay_seconds=max(0.0, args.inter_request_delay_seconds),
     )
 
     definition = BenchmarkDefinition(
@@ -167,7 +169,15 @@ def main() -> None:
         print("error_message:", exc.message, flush=True)
         print("duration_seconds:", f"{duration_seconds:.2f}", flush=True)
         if exc.code == "provider_rate_limit":
-            print("hint: OpenRouter free tier daily limit reached. Retry after reset or add credits.", flush=True)
+            if provider_name == "gemini":
+                print(
+                    "hint: Gemini free tier rate limit reached. Try --inter-request-delay-seconds 12 (or more), wait for retry window, or upgrade quota.",
+                    flush=True,
+                )
+            elif provider_name == "openai":
+                print("hint: OpenRouter/OpenAI rate limit reached. Retry after reset or add credits.", flush=True)
+            else:
+                print("hint: Provider rate limit reached. Retry later or reduce request speed.", flush=True)
         raise SystemExit(1)
 
     duration_seconds = perf_counter() - run_started_at

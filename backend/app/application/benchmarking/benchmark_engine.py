@@ -21,11 +21,13 @@ class BenchmarkEngine:
         *,
         max_retries: int = 0,
         retry_delay_seconds: float = 0.0,
+        inter_request_delay_seconds: float = 0.0,
     ) -> None:
         self._provider_manager = provider_manager
         self._scoring_engine = scoring_engine
         self._max_retries = max_retries
         self._retry_delay_seconds = retry_delay_seconds
+        self._inter_request_delay_seconds = inter_request_delay_seconds
 
     def run(self, definition: BenchmarkDefinition) -> BenchmarkRunResult:
         return self.run_with_progress(definition)
@@ -40,6 +42,9 @@ class BenchmarkEngine:
         total_questions = len(definition.questions)
 
         for index, question in enumerate(definition.questions, start=1):
+            if index > 1 and self._inter_request_delay_seconds > 0:
+                sleep(self._inter_request_delay_seconds)
+
             question_started_at = perf_counter()
             if progress_callback is not None:
                 progress_callback(
