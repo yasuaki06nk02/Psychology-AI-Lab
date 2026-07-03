@@ -135,9 +135,9 @@ Completion status should be updated as development progresses.
 
 ## OpenAI
 
- [ ] Adapter
- [ ] Chat Completion
- [ ] Model Discovery
+ [x] Adapter
+ [x] Chat Completion
+ [x] Model Discovery
 
 ## Gemini
 
@@ -164,8 +164,8 @@ Completion status should be updated as development progresses.
  [x] Benchmark Loader
  [x] Prompt Builder
  [x] Execution Pipeline
- [ ] Retry Logic
- [ ] Timeout Handling
+ [x] Retry Logic
+ [x] Timeout Handling
  [x] Metadata Recording
 
 ---

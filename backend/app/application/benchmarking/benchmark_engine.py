@@ -1,3 +1,6 @@
+from time import sleep
+
+from app.application.errors import AppError
 from app.application.benchmarking.models import (
     BenchmarkDefinition,
     BenchmarkResponse,
@@ -9,9 +12,18 @@ from app.application.providers.provider_manager import ProviderManager
 
 
 class BenchmarkEngine:
-    def __init__(self, provider_manager: ProviderManager, scoring_engine: ScoringEngine) -> None:
+    def __init__(
+        self,
+        provider_manager: ProviderManager,
+        scoring_engine: ScoringEngine,
+        *,
+        max_retries: int = 0,
+        retry_delay_seconds: float = 0.0,
+    ) -> None:
         self._provider_manager = provider_manager
         self._scoring_engine = scoring_engine
+        self._max_retries = max_retries
+        self._retry_delay_seconds = retry_delay_seconds
 
     def run(self, definition: BenchmarkDefinition) -> BenchmarkRunResult:
         responses: list[BenchmarkResponse] = []
@@ -22,15 +34,13 @@ class BenchmarkEngine:
                 question_id=question.id,
             )
 
-            provider_response = self._provider_manager.execute_prompt(
-                definition.provider_name,
-                ProviderRequest(
-                    model_name=definition.model_name,
-                    system_prompt=definition.prompt_template.system_prompt,
-                    developer_prompt=definition.prompt_template.developer_prompt,
-                    user_prompt=user_prompt,
-                ),
+            request = ProviderRequest(
+                model_name=definition.model_name,
+                system_prompt=definition.prompt_template.system_prompt,
+                developer_prompt=definition.prompt_template.developer_prompt,
+                user_prompt=user_prompt,
             )
+            provider_response = self._execute_with_retry(definition.provider_name, request)
 
             responses.append(
                 BenchmarkResponse(
@@ -58,3 +68,31 @@ class BenchmarkEngine:
             responses=responses,
             score=score,
         )
+
+    def _execute_with_retry(
+        self,
+        provider_name: str,
+        request: ProviderRequest,
+    ):
+        attempts = self._max_retries + 1
+        last_error: AppError | None = None
+        retryable_codes = {
+            "provider_timeout",
+            "provider_connection_error",
+            "provider_execution_error",
+        }
+
+        for attempt in range(attempts):
+            try:
+                return self._provider_manager.execute_prompt(provider_name, request)
+            except AppError as exc:
+                last_error = exc
+                should_retry = exc.code in retryable_codes and attempt < attempts - 1
+                if not should_retry:
+                    raise
+                if self._retry_delay_seconds > 0:
+                    sleep(self._retry_delay_seconds)
+
+        if last_error is not None:
+            raise last_error
+        raise AppError("provider_execution_error", "Provider execution failed", 502)
